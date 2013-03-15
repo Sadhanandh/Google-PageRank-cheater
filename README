@@ -1,0 +1,30 @@
+This is an app to cheat google and bring your site to the top of the Google Search Results.
+
+1) Uses I/P rotation
+2) Uses User-Agent Switching.
+3) Provides Random Delay.
+4) Can support multiple search terms
+
+
+There are 2 versions.
+
+* Headless version -> this can be deployed on your server without XWindow.
+Drawbacks - >
+	Doesnt support Javascript. (TODO - add a javascript library)
+	Doesnt fetch images,Css and other external files. (Probably Google tracks this action or rather they must.) (TODO - Download all assosiated files.)
+
+
+	Usage - >
+
+	.change the config.ini (use config.ini.eg as a reference .All supported config is present there.)
+	.start it $ ./main
+
+* Browser Version.
+-> this needs an Xwindow but can never be detected as a bot.
+
+	Usage - >
+
+	.change the googleconfig.ini
+	.Add more settings in the support/UAx firefox profile
+	.start as $ ./google
+

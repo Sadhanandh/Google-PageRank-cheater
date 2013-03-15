@@ -1,0 +1,90 @@
+#!/usr/bin/env python
+import re
+import os
+import browsermod
+import random
+import glob
+
+settingsfile = "config.ini"
+uafile = "uafile.ini"
+query_word = "hello"
+s_url = "http://en.wikipedia.org/wiki/HelloWorld"
+max_n =10
+min_rand = 2
+max_rand = 10
+no_time = 2
+tor_port = 9051
+tor_host = "localhost"
+tor_pass = ""
+tor_u_port = 9050
+using_tor = False
+
+if os.path.exists(settingsfile):
+	fr = open(settingsfile)
+	data = fr.read()
+	ma = re.findall("Url\s*:\s*(\S+)",data,re.IGNORECASE)
+	if ma != []:
+		s_url = ma[0]
+	ma = re.findall("Word\s*:\s*(\S+.*)",data,re.IGNORECASE)
+	if ma != []:
+		query_word = ma[0]
+	ma = re.findall("Max\s*:\s*(\d*)",data,re.IGNORECASE)
+	if ma != []:
+		max_n = int(ma[0])
+	ma = re.findall("Min\s*Time\s*:\s*(\d*)",data,re.IGNORECASE)
+	if ma != []:
+		min_rand = int(ma[0])
+	ma = re.findall("Max\s*Time\s*:\s*(\d*)",data,re.IGNORECASE)
+	if ma != []:
+		max_rand = int(ma[0])
+	ma = re.findall("No\s*of\s*Times\s*:\s*(\d*)",data,re.IGNORECASE)
+	if ma != []:
+		no_time = int(ma[0])
+	ma = re.findall("Using\s*Tor\s*:\s*(\S+.*)",data,re.IGNORECASE)
+	if ma != []:
+		if(ma[0].lower()=="true"):
+			using_tor = True
+	ma = re.findall("Tor\s*Control\s*Port\s*:\s*(\d*)",data,re.IGNORECASE)
+	if ma != []:
+		tor_port = int(ma[0])
+		using_tor = True
+	ma = re.findall("Tor\s*Host\s*:\s*(\S+.*)",data,re.IGNORECASE)
+	if ma != []:
+		tor_host = ma[0]
+		using_tor = True
+	ma = re.findall("Tor\s*Auth\s*Pass\s*:\s*(\S+.*)",data,re.IGNORECASE)
+	if ma != []:
+		tor_pass = ma[0]
+		using_tor = True
+	ma = re.findall("Tor\s*User\s*Port\s*:\s*(\d*)",data,re.IGNORECASE)
+	if ma != []:
+		tor_u_port = int(ma[0])
+		using_tor = True
+	fr.close()
+
+
+if os.path.exists(uafile):
+	fr = open(uafile)
+	data = fr.read()
+	ualist=data.split("\n")
+	UA = ualist[random.randrange(0,len(ualist)-1)]
+
+print "Config----"
+print s_url,query_word,max_n,min_rand,max_rand,UA
+print ""
+
+failcount =0
+for x in range(no_time):
+	success = browsermod.cheatgoogle(query_word,s_url,max_n,min_rand,max_rand,UA,using_tor,tor_u_port)
+	failcount+=int(success)
+	if using_tor:
+		browsermod.changeip(tor_host,tor_port,tor_pass)
+		#browsermod.changeiptelnet(tor_host,tor_port,tor_pass)
+	for c in glob.glob(os.path.join(os.path.abspath("."),"files/*.*")):
+		print c
+		os.remove(c) 
+	print " "
+	print "Deleting all saved html files....."
+	print " "
+if failcount>0:
+	print failcount ,"Requests have failed as those IP's were blacklisted by google."
